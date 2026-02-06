@@ -1,29 +1,99 @@
-# Viikkotehtävä 2 Kotlin (week2)
+# Viikkotehtävä 4 Kotlin (week4)
 
-### Model (domain-paketti)
-- **Task.kt** – datamalli tehtävälle (id, title, description, priority, dueDate, done)
-- **MockTasks** – valmis testausdata
+## Navigointi Jetpack Composessa
+- Navigointi mahdollistaa siirtymisen eri näkymien (screenien) välillä sovelluksessa. Jetpack Compose käyttää Navigation Compose -kirjastoa, joka integroi navigaation deklaratiiviseen UI-malliin.
+
+### NavController
+- Hallitsee navigaatiota sovelluksessa
+- Muistaa navigaatiohistorian
+- Tarjoaa metodit: `navigate()`, `popBackStack()`, `navigateUp()`
+
+### NavHost
+- Määrittelee navigaatiorakenteen
+- Sisältää kaikki reitit (routes) ja niitä vastaavat Composablet
+- Yhdistää reitin tiettyyn ruutuun
+
+### Sovelluksen navigaatiorakenne
+- **HomeScreen → CalendarScreen**: `navController.navigate(ROUTE_CALENDAR)`
+- **CalendarScreen → HomeScreen**: `navController.popBackStack()`
+- TopAppBar sisältää kalenterikonin (HomeScreen) ja takaisin-nuolen (CalendarScreen)
+
+## MVVM + Navigointi
+
+### Yksi ViewModel kahdelle screenille
+
+- ViewModel luodaan **NavHostin tasolla** MainActivity:ssä ja välitetään parametrina molemmille ruuduille
+- Sama tila jaetaan molempien ruutujen välillä
+- Muutokset näkyvät heti kummassakin näkymässä
+- Ei tarvetta tilan synkronointiin
+
+### Jaettu StateFlow-tila
+
+Molemmat ruudut kuuntelevat samaa StateFlowta: `val tasks by viewModel.tasks.collectAsState()`
+
+**Kun käyttäjä muokkaa tehtävää:**
+1. UI kutsuu ViewModelin funktiota (esim. `toggleDone()`)
+2. ViewModel päivittää `_tasks.value`
+3. StateFlow emittoi uuden arvon
+4. **Molemmat** ruudut saavat päivityksen automaattisesti
+5. UI rekomponoituu molemmissa näkymissä
+
+## CalendarScreen
+
+**Toteutus:**
+- Tehtävät ryhmitellään `dueDate`-kentän mukaan: `tasks.groupBy { it.dueDate }.toSortedMap()`
+- Näytetään päivämäärä otsikkona ja sen alla kyseisen päivän tehtävät
+
+**Ominaisuudet:**
+- Sama `toggleDone()` toiminnallisuus kuin HomeScreenissä
+- Tehtävän klikkaus avaa `DetailDialog`:n muokkausta varten
+- Kaikki muutokset synkronoituvat automaattisesti HomeScreenin kanssa
+
+## AlertDialog: Add & Edit
+
+### AddTask
+- Toteutettu HomeScreenissä yksinkertaisella TextField + Button -yhdistelmällä
+- Käyttäjä kirjoittaa otsikon ja painaa "Add"
+- Kutsuu `viewModel.addTask(title)`
+
+### EditTask (DetailDialog)
+- Avataan kun käyttäjä klikkaa tehtävää (HomeScreen tai CalendarScreen)
+- Paikallinen tila: `var selectedTask by remember { mutableStateOf<Task?>(null) }`
+
+**DetailDialog sisältää:**
+- Esitäytetyt tekstikentät (title, description)
+- **"Save"** → `viewModel.updateTask(task.id, title, description)`
+- **"Delete"** → `viewModel.removeTask(task.id)` + vahvistus
+- **"Cancel"** → sulje dialogi ilman muutoksia
+
+## Kerrosrakenne
+
+### Model (model-paketti)
+- **Task.kt** – datamalli (id, title, description, priority, dueDate, done)
+- **MockTasks** – testausdata
 
 ### ViewModel (viewmodel-paketti)
-- **TaskViewModel.kt** – hallitsee sovelluksen tilaa ja logiikkaa
-- Käyttää **StateFlow**:ta reaktiiviseen tilan hallintaan
-- Toiminnot: addTask(), toggleDone(), updateTask(), removeTask(), filterByDone(), sortByDueDate(), showAll()
+- **TaskViewModel.kt** – tilan hallinta StateFlow:lla
+- Toiminnot: `addTask()`, `toggleDone()`, `updateTask()`, `removeTask()`, `filterByDone()`, `sortByDueDate()`, `showAll()`
 
 ### View (view-paketti)
-- **HomeScreen.kt** – näyttää tehtävälistan
-- **DetailDialog.kt** – tehtävän muokkaus ja poisto
-- UI kuuntelee ViewModelin tilaa collectAsState():lla
-- Päivitykset näkyvät automaattisesti listassa
+- **HomeScreen.kt** – tehtävälista
+- **CalendarScreen.kt** – kalenterinäkymä
+- **DetailDialog.kt** – muokkaus ja poisto
+- UI kuuntelee ViewModelin tilaa `collectAsState()`:lla
+- Päivitykset näkyvät automaattisesti
 
-## StateFlow
-- Reaktiivinen tilan hallintaratkaisu
-- Aina aktiivinen, emittoi viimeisimmän arvon heti
-- UI päivittyy automaattisesti
+### Navigation (navigation-paketti)
+- **Routes.kt** – reitit (`ROUTE_HOME`, `ROUTE_CALENDAR`)
+
+### MainActivity
+- Luo NavController ja ViewModel
+- Määrittelee NavHost:n navigaatiorakenteen
 
 ## Demovideo
 
-**Viikko3 video: https://youtu.be/4wLQ5KoWOzM**
+**Viikko4 video:**
 
+(Viikko3 video: https://youtu.be/4wLQ5KoWOzM)
 (Viikko2 video: https://youtu.be/MCC26KozVKk)
-
 (Viikko1 video: https://www.youtube.com/watch?v=QC4-GotNdLk)
