@@ -10,7 +10,7 @@
 
 ### NavHost
 - Määrittelee navigaatiorakenteen
-- Sisältää kaikki reitit (routes) ja niitä vastaavat Composablet
+- Sisältää kaikki reitit ja niitä vastaavat Composablet
 - Yhdistää reitin tiettyyn ruutuun
 
 ### Sovelluksen navigaatiorakenne
@@ -22,7 +22,7 @@
 
 ### Yksi ViewModel kahdelle screenille
 
-- ViewModel luodaan **NavHostin tasolla** MainActivity:ssä ja välitetään parametrina molemmille ruuduille
+- ViewModel luodaan NavHostin tasolla MainActivity:ssä ja välitetään parametrina molemmille ruuduille
 - Sama tila jaetaan molempien ruutujen välillä
 - Muutokset näkyvät heti kummassakin näkymässä
 - Ei tarvetta tilan synkronointiin
@@ -35,7 +35,7 @@ Molemmat ruudut kuuntelevat samaa StateFlowta: `val tasks by viewModel.tasks.col
 1. UI kutsuu ViewModelin funktiota (esim. `toggleDone()`)
 2. ViewModel päivittää `_tasks.value`
 3. StateFlow emittoi uuden arvon
-4. **Molemmat** ruudut saavat päivityksen automaattisesti
+4. Molemmat ruudut saavat päivityksen automaattisesti
 5. UI rekomponoituu molemmissa näkymissä
 
 ## CalendarScreen
@@ -80,6 +80,7 @@ Molemmat ruudut kuuntelevat samaa StateFlowta: `val tasks by viewModel.tasks.col
 - **HomeScreen.kt** – tehtävälista
 - **CalendarScreen.kt** – kalenterinäkymä
 - **DetailDialog.kt** – muokkaus ja poisto
+- **AddTaskDialog.kt** - Uuden tehtävän lisääminen
 - UI kuuntelee ViewModelin tilaa `collectAsState()`:lla
 - Päivitykset näkyvät automaattisesti
 
@@ -92,8 +93,4 @@ Molemmat ruudut kuuntelevat samaa StateFlowta: `val tasks by viewModel.tasks.col
 
 ## Demovideo
 
-**Viikko4 video:**
-
-(Viikko3 video: https://youtu.be/4wLQ5KoWOzM)
-(Viikko2 video: https://youtu.be/MCC26KozVKk)
-(Viikko1 video: https://www.youtube.com/watch?v=QC4-GotNdLk)
+**Viikko4 video: https://youtu.be/hlWMvchsL2I**
